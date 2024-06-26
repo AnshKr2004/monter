@@ -92,3 +92,30 @@ async function sendOTP(email, otp) {
   // Send email
   await transporter.sendMail(mailOptions);
 }
+
+// Update user information
+router.put('/update', async (req, res) => {
+  const { location, age, work, dob, description } = req.body;
+
+  try {
+    let user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Update fields
+    user.location = location;
+    user.age = age;
+    user.work = work;
+    user.dob = dob;
+    user.description = description;
+
+    await user.save();
+
+    res.json({ message: 'User information updated successfully' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
