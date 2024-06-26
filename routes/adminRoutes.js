@@ -81,3 +81,35 @@ const auth = (req, res, next) => {
     res.status(401).json({ message: "Token is not valid" });
   }
 };
+
+// Get details of a specific user by username
+router.get("/user/:username", auth, async (req, res) => {
+  try {
+    const user = await User.findOne({ username: req.params.username }).select(
+      "-password"
+    );
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server error");
+  }
+});
+
+// Delete a specific user by username
+router.delete("/user/:username", auth, async (req, res) => {
+  try {
+    const user = await User.findOneAndDelete({ username: req.params.username });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({ message: "User deleted successfully" });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server error");
+  }
+});
+
+module.exports = router;
